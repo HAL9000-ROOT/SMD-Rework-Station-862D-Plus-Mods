@@ -1,0 +1,150 @@
+#include <Wire.h>
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
+
+#define  OLED_ADDR   0x3C
+Adafruit_SSD1306 display(-1);
+
+int settemp = 590; //manual  set variables
+
+int output = 0;
+int temp = 0;
+String inputString = "";
+boolean  rap = false;
+boolean stringComplete = false;
+int t = 0;
+int mappedpower  = 0;
+byte powermultiply = 0;
+long counter = 0;
+int temp2 = 0;
+byte outputoffset  = 0;
+byte scaleread = 0;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(12,  OUTPUT);
+  digitalWrite(12, LOW);
+  display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
+  display.clearDisplay();
+  display.display();
+  rapid();
+}
+
+void  loop() {
+  pid();
+  display.clearDisplay();
+  updatebar();
+  updatetext();
+  display.display();
+}
+
+void rapid() { //Controls the soldering iron by  rapidly heating it up in the beginning.
+  if (rap == false) {
+    digitalWrite(12,  HIGH);
+    output = 255;
+    do {
+      temp = analogRead(0);
+      Serial.print("rapid");
+      Serial.println(temp);
+      display.clearDisplay();
+      updatebar();
+      updatetext();
+      display.display();
+    } while (temp - settemp >  1);
+    digitalWrite(12, LOW);
+    rap = true;
+  }
+}
+
+void pid()  { //Controls the soldering with slow active power heating.
+  temp = analogRead(0);  //Temp averager
+  temp2 = temp;
+  delay(50);
+  temp = analogRead(0);
+  temp = temp + temp2;
+  temp = temp / 2;
+
+  zeroscale(); //activate no  soldering iron checker
+  temp = temp + outputoffset;
+
+  output = temp -  settemp;
+  output = output + powermultiply;
+  output = output * 4;
+
+  if (output < 0) {
+    output = 0;
+  }
+  if (output > 255) {
+    output  = 255;
+  }
+  counter = counter + 1;
+  if (counter > 10) {
+    counter  = 0;
+    if (temp > settemp + 3) {
+      powermultiply = powermultiply + 1;
+    }
+    if (temp < settemp - 3 && powermultiply > 0) {
+      powermultiply  = powermultiply - 1;
+    }
+  }
+  Serial.print(powermultiply);
+  Serial.print(",  ");
+  Serial.print(temp);
+  Serial.print(", ");
+  Serial.println(output);
+  analogWrite(12, output);
+}
+
+void updatebar() { //Updates Powerbar on  OLED display
+  mappedpower = map(output, 0, 255, 0, 127) - 10;
+  display.fillRect(0,  0, mappedpower, 8, WHITE);
+  display.fillRoundRect(mappedpower - 5, 0, 20, 8,  3, WHITE);
+}
+
+void updatetext() {//Update text on Oled display
+  display.setCursor(0,  9);
+  display.setTextColor(WHITE);
+  display.setTextSize(1);
+  display.print("Set  Temp: ");
+  display.print(settemp);
+  display.setCursor(0, 20);
+  display.print("Temp:  ");
+  display.print(temp);
+}
+
+void zeroscale() { //If soldering iron  is unplugged, adjust the input pin value to zero it out
+  if (temp < 200) {
+    display.clearDisplay();
+
+    display.setCursor(0, 20);
+    display.setTextColor(WHITE);
+    display.setTextSize(1);
+    display.print("No soldering iron.");
+    display.display();
+    delay(10000);
+    
+    display.setCursor(0, 0);
+    display.print("Testing  in 5 seconds.");
+
+    display.display();
+    delay(5000);
+
+    if  (temp < 200) {
+      outputoffset = temp;
+    }
+    display.clearDisplay();
+
+    display.setCursor(0, 20);
+    display.setTextColor(WHITE);
+    display.setTextSize(1);
+    display.print("Output offset set.");
+    display.setCursor(0, 0);
+    display.print("Connect  the iron.");
+
+    display.display();
+    do {
+      scaleread = analogRead(0);
+    } while (scaleread < 200);
+
+  }
+}
