@@ -57,12 +57,6 @@ Handle Frame: 1pc
 Iron Handle (including a heater and tips): 1pc
 Iron Holder: 1pc
 
-Application of Hot Air Rework Station with Soldering Iron
-1. Electronic product assembly
-2. Product development in scientific research departments
-3. Electronic products maintenance
-4. Electrical soldering operation
-5. Skill training in all kinds of electronic institutions
 
 ## Modifications
 
