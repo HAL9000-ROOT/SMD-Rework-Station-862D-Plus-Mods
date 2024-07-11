@@ -23,7 +23,11 @@ This draft README file serves as the framework for the introduction to that work
 
 ## About the 862D+
 
-[While the device used for this project includes no branding, the Yihua website (http://yihua-soldering.com/product-1-3-2-hot-air-rework-station-en/147663/) provides specifications for an identical device, as follows:
+The 862D+ SMD hot air gun features both manual or automatic function modes. For repeated usage in a single work session, the manual adjustment can keep the hot air gun hot, and the automatic function, for less frequent use, saves energy by shutting down the device when resting on its magnetic support bracket. The user may adjust both the heating temperature and fan velocity of the gun. 
+
+The soldering iron has manual temperature control.
+
+While the device used for this project includes no branding, the Yihua website (http://yihua-soldering.com/product-1-3-2-hot-air-rework-station-en/147663/) provides specifications for an identical device, as follows:
 
 Rated Voltage	AC 220V±10% 50Hz
 Machine Power	730W±10% (max.)
